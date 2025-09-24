@@ -1,3 +1,18 @@
+import sys
+
+if len(sys.argv) != 3:
+    print("Usage: python maze.py <file> <algorithm: DFS | BFS>")
+    sys.exit(1)
+
+filename = sys.argv[1]
+algorithm = sys.argv[2].upper()
+print(filename)
+print(algorithm)
+
+if algorithm not in ["DFS", "BFS"]:
+    print("Invlaid algorithm. Algorithms: DFS, BFS")
+    sys.exit(1)
+
 class Node:
     def __init__(self,state, parent, action, posX, posY):
         self.state = state
@@ -170,9 +185,19 @@ class QueueFrontier(StackFrontier):
         self.frontier.pop(0)
         return node
 
-            
-file = open("maze1.txt", "r")
+try:
+    file = open(filename, "r")
+except:
+    print(f"File {filename} not found")
+    sys.exit(1)
+
 frontier = StackFrontier()
+
+if sys.argv[2] == "DFS":
+    frontier = StackFrontier()
+elif sys.argv[2] == "BFS":
+    frontier = QueueFrontier()
+
 print(" "*100)
 state = frontier.solve(file)
-input()
+file.close()
