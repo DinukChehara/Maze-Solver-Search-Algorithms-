@@ -77,7 +77,8 @@ class StackFrontier:
         iterations = 0
         while True:
             print(f"iteration: {iterations}")
-            print(self.frontier)
+            print("frontier: ", self.frontier)
+            print("\nstate:")
             [print(line) for line in state] 
             print("\n"*4)
 
@@ -94,6 +95,7 @@ class StackFrontier:
             if node.action == "goal":
                 print("solved")
                 print(f"iteration: {iterations}")
+                print("\nstate:")
                 [print(line) for line in state] 
                 break
             
