@@ -5,7 +5,7 @@ import matplotlib.colors as mcolors
 import numpy as np
 
 if len(sys.argv) != 3:
-    print("Usage: python maze.py <file> <algorithm: DFS | BFS>")
+    print("Usage: python maze.py <file> <algorithm: DFS | BFS | A*>")
     sys.exit(1)
 
 filename = sys.argv[1]
