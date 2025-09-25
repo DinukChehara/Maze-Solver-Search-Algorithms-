@@ -13,26 +13,27 @@ algorithm = sys.argv[2].upper()
 print(filename)
 print(algorithm)
 
-if algorithm not in ["DFS", "BFS"]:
+if algorithm not in ["DFS", "BFS", "A*"]:
     print("Invlaid algorithm. Algorithms: DFS, BFS")
     sys.exit(1)
 
 class Node:
-    def __init__(self,state, parent, action, posX, posY, is_goal):
+    def __init__(self,state, parent, action, posX, posY, is_goal, goalX = None, goalY = None, step = None):
         self.state = state
         self.parent = parent
         self.action = action
         self.posX = posX
         self.posY = posY
         self.is_goal = is_goal
-
-    def __str__(self):
-        return f"parent: {self.parent} action: {self.action}"
+        self.step = step
+        self.cost = None
+        if goalY != None and goalX != None and step != None:
+            self.cost = (goalX - posX) + (goalY - posY) + step
     
     def __repr__(self):
-        return f"Node(action={self.action}, pos=({self.posX}, {self.posY}), goal={self.is_goal})"
-    
-class StackFrontier:
+        return f"Node(action={self.action}, pos=({self.posX}, {self.posY}), goal={self.is_goal}, step={self.step}, cost={self.cost})"
+
+class Frontier():
     def __init__(self):
         self.frontier = []
         self.explored = []
@@ -40,13 +41,23 @@ class StackFrontier:
 
     def add(self, node):
         self.frontier.append(node)
-    
+
     def hasNode(self, node):
         return node in self.frontier
     
     def empty(self):
         return len(self.frontier) == 0
     
+    def removeNode(self, node):
+        self.frontier.remove(node)
+
+    def remove(self):
+        node = self.frontier[-1]
+        self.frontier.pop(-1)
+        return node
+
+class DepthFirstSearch(Frontier):
+
     def remove(self):
         if self.empty():
             raise Exception("Frontier is empty")
@@ -175,18 +186,181 @@ class StackFrontier:
                     new_state[node.posY] = new_state[node.posY][:node.posX + 1] + "*" + new_state[node.posY][node.posX + 2:]
                 self.add(Node(new_state, node, "right", node.posX + 1, node.posY, is_goal))
             
+            self.actions.append(node.action)
             iterations+=1
 
 
         return state
 
-class QueueFrontier(StackFrontier):
+class BreadthFirstSearch(DepthFirstSearch):
     def remove(self):
         if self.empty():
             raise Exception("Frontier is empty")
         node = self.frontier[0]
         self.frontier.pop(0)
         return node
+
+
+class AStarSearch:
+    def __init__(self):
+        self.frontier = Frontier()
+        self.explored = []
+    
+    def solve(self, file):
+        state = file.readlines()
+        state = [line.strip('\n') for line in state]
+        
+        startX = 0
+        startY = 0
+        goalX = 0
+        goalY = 0
+
+        for row in state:
+            try: 
+                startX = row.index("A") 
+            except: continue
+            if startX == None:
+                raise "Start position not found"
+            startY = state.index(row)
+            break
+        
+        for row in state:
+            try:
+                goalX = row.index("B")
+            except: continue
+            if goalX == None:
+                raise "Goal position not found"
+            goalY = state.index(row)
+            break
+        
+
+        startNode = Node(state, None, None,startX, startY, False, goalX, goalY, 0)
+        self.frontier.add(startNode)
+
+        # check if frontier is empty
+        # remove a node
+        # check if node = goal
+        # check if fronteir has any node with low cost -> remove that node
+        # add child nodes to frontier
+        iterations = 0
+        while True:
+            print("\n"*10)
+            print(f"startPos={startX},{startY}")
+            print(f"goalPos={goalX},{goalY}")
+            print(self.frontier.frontier)
+            print("iteration: ", iterations)
+            print("\nstate: ")
+            [print(line) for line in state]
+            
+            if len(self.frontier.frontier) == 0:
+                print("no solutions")
+                return state
+            
+            node = self.frontier.remove()
+            self.explored.append(node)
+            self.addChildNodes(node, goalX, goalY)
+            state = node.state
+            cost = node.cost
+
+            if node.is_goal:
+                print("solved")
+                return state
+
+            costs = {}
+            for n in self.frontier.frontier:
+                if n.cost!=None:
+                    costs[n.cost] = n
+            if min(costs.keys()) < cost:
+                node = costs.get(min(costs.keys()))
+                
+                print(self.frontier.frontier)
+                print(node)
+                
+                self.frontier.removeNode(node)
+                self.addChildNodes(node, goalX, goalY)
+                self.explored.append(node)
+                state = node.state
+
+            iterations+=1
+
+    def addChildNodes(self, node, goalX, goalY):
+            state = node.state
+
+            up = None
+            down = None
+            left = None
+            right = None
+            
+            try:
+                up = state[node.posY - 1][node.posX]
+                if up == "B":
+                    up = "goal"
+                    
+                elif up != " ":
+                    up = None
+            except:pass
+            
+            try:
+                down = state[node.posY + 1][node.posX]
+                if down == "B":
+                    down = "goal"
+                elif down != " ":
+                    down = None
+            except:pass
+            
+            try:
+                right = state[node.posY][node.posX + 1]
+                if right == "B":
+                    right = "goal"
+                elif right != " ":
+                    right = None
+            except:pass
+            
+            try: 
+                left = state[node.posY][node.posX - 1]
+                if left == "B":
+                    left = "goal"
+                elif left != " ":
+                    left = None
+            except: pass
+
+            # adding the child nodes to the frontier
+            if up is not None:
+                new_state = state.copy()
+                is_goal = up == "goal"
+                if up == " ":
+                    new_state[node.posY - 1] = new_state[node.posY - 1][:node.posX] + "*" + new_state[node.posY - 1][node.posX + 1:]
+                
+                parentStep = node.step if node.step != None else 0
+                self.frontier.add(Node(new_state, node, "up", node.posX, node.posY - 1, is_goal, goalX, goalY, parentStep + 1))
+
+            if down is not None:
+                new_state = state.copy()
+                is_goal = down == "goal"
+                if down == " ":
+                    new_state[node.posY + 1] = new_state[node.posY + 1][:node.posX] + "*" + new_state[node.posY + 1][node.posX + 1:]
+
+                parentStep = node.step if node.step != None else 0
+                self.frontier.add(Node(new_state, node, "down", node.posX, node.posY + 1, is_goal, goalX, goalY, parentStep+1))
+
+            if left is not None:
+                new_state = state.copy()
+                is_goal = left == "goal"
+                if left == " ":
+                    new_state[node.posY] = new_state[node.posY][:node.posX - 1] + "*" + new_state[node.posY][node.posX:]
+                    
+                parentStep = node.step if node.step != None else 0
+                self.frontier.add(Node(new_state, node, "left", node.posX - 1, node.posY, is_goal, goalX, goalY, parentStep+1))
+
+            if right is not None:
+                new_state = state.copy()
+                is_goal = right == "goal"
+                if right == " ":
+                    new_state[node.posY] = new_state[node.posY][:node.posX + 1] + "*" + new_state[node.posY][node.posX + 2:]
+                    
+                parentStep = node.step if node.step != None else 0
+                self.frontier.add(Node(new_state, node, "right", node.posX + 1, node.posY, is_goal, goalX, goalY, parentStep+1))
+
 
 def visualize_maze(maze, explored):
     cols = max(len(row) for row in maze)
@@ -264,9 +438,11 @@ def main():
         print(f"File '{filename}' not found")
         sys.exit(1)
 
-    frontier = StackFrontier()
+    frontier = DepthFirstSearch()
     if sys.argv[2] == "BFS":
-        frontier = QueueFrontier()
+        frontier = BreadthFirstSearch()
+    elif sys.argv[2] == "A*":
+        frontier = AStarSearch()
 
     print(" "*100)
     state = frontier.solve(file)
