@@ -1,4 +1,5 @@
 import sys
+import PIL
 
 if len(sys.argv) != 3:
     print("Usage: python maze.py <file> <algorithm: DFS | BFS>")
@@ -187,19 +188,21 @@ class QueueFrontier(StackFrontier):
         self.frontier.pop(0)
         return node
 
-try:
-    file = open(filename, "r")
-except:
-    print(f"File {filename} not found")
-    sys.exit(1)
 
-frontier = StackFrontier()
+def main():
+    try:
+        file = open(filename, "r")
+    except:
+        print(f"File '{filename}' not found")
+        sys.exit(1)
 
-if sys.argv[2] == "DFS":
     frontier = StackFrontier()
-elif sys.argv[2] == "BFS":
-    frontier = QueueFrontier()
+    if sys.argv[2] == "BFS":
+        frontier = QueueFrontier()
 
-print(" "*100)
-state = frontier.solve(file)
-file.close()
+    print(" "*100)
+    frontier.solve(file)
+    file.close()
+
+if __name__ == "__main__":
+    main()
