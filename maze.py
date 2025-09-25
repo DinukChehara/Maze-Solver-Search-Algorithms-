@@ -1,5 +1,8 @@
 import sys
 import PIL
+import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
+import numpy as np
 
 if len(sys.argv) != 3:
     print("Usage: python maze.py <file> <algorithm: DFS | BFS>")
@@ -185,6 +188,74 @@ class QueueFrontier(StackFrontier):
         self.frontier.pop(0)
         return node
 
+def visualize_maze(maze, explored):
+    cols = max(len(row) for row in maze)
+    rows = len(maze)
+
+    # Pad rows with spaces
+    maze = [row.ljust(cols) for row in maze]
+
+    # Find start ('A') and goal ('B')
+    start = None
+    goal = None
+    for y, row in enumerate(maze):
+        for x, char in enumerate(row):
+            if char == 'A':
+                start = (x, y)
+            elif char == 'B':
+                goal = (x, y)
+
+    # Build path from '*' characters in maze
+    path = []
+    for y, row in enumerate(maze):
+        for x, char in enumerate(row):
+            if char == '*':
+                node = type('Node', (), {})()
+                node.posX = x
+                node.posY = y
+                path.append(node)
+    
+    # Base grid: unexplored = gray (2), wall = black (0)
+    grid = np.zeros((rows, cols))
+    for y in range(rows):
+        for x in range(cols):
+            char = maze[y][x]
+            if char == '#':
+                grid[y][x] = 0  # wall
+            else:
+                grid[y][x] = 2  # unexplored
+
+    # Mark explored = yellow (3)
+    for node in explored:
+        grid[node.posY][node.posX] = 3
+    
+    # Mark path = green (4)
+    for node in path:
+        grid[node.posY][node.posX] = 4
+
+    # Mark start = blue (5), goal = red (6)
+    if start:
+        grid[start[1]][start[0]] = 5
+    if goal:
+        grid[goal[1]][goal[0]] = 6
+
+    # Colormap
+    cmap = mcolors.ListedColormap(["black", "white", "gray", "yellow", "green", "blue", "red"])
+    bounds = [0, 1, 2, 3, 4, 5, 6, 7]
+    norm = mcolors.BoundaryNorm(bounds, cmap.N)
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(cols/2, rows/2))  # make bigger
+    im = ax.imshow(grid, cmap=cmap, norm=norm, origin='upper')
+
+    # Add small gaps between blocks
+    ax.set_xticks(np.arange(-0.5, cols, 1), minor=True)
+    ax.set_yticks(np.arange(-0.5, rows, 1), minor=True)
+    ax.grid(which='minor', color='black', linestyle='-', linewidth=1)
+
+    ax.tick_params(which='both', bottom=False, left=False, labelbottom=False, labelleft=False)
+    plt.show()
+
 
 def main():
     try:
@@ -198,8 +269,9 @@ def main():
         frontier = QueueFrontier()
 
     print(" "*100)
-    frontier.solve(file)
+    state = frontier.solve(file)
     file.close()
+    visualize_maze(state, frontier.explored)
 
 if __name__ == "__main__":
     main()
