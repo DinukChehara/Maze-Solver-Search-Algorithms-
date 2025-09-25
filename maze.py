@@ -15,18 +15,19 @@ if algorithm not in ["DFS", "BFS"]:
     sys.exit(1)
 
 class Node:
-    def __init__(self,state, parent, action, posX, posY):
+    def __init__(self,state, parent, action, posX, posY, is_goal):
         self.state = state
         self.parent = parent
         self.action = action
         self.posX = posX
         self.posY = posY
+        self.is_goal = is_goal
 
     def __str__(self):
         return f"parent: {self.parent} action: {self.action}"
     
     def __repr__(self):
-        return f"Node(action={self.action}, pos={self.posX}, {self.posY})"
+        return f"Node(action={self.action}, pos=({self.posX}, {self.posY}), goal={self.is_goal})"
     
 class StackFrontier:
     def __init__(self):
@@ -72,7 +73,7 @@ class StackFrontier:
         4. add children nodes to frontier
         """
 
-        startNode = Node(state, None, None, startX, startY)
+        startNode = Node(state, None, None, startX, startY, False)
         self.add(startNode)
 
         iterations = 0
@@ -93,7 +94,7 @@ class StackFrontier:
             state = node.state
 
             # checks if the node is the goal
-            if node.action == "goal":
+            if node.is_goal:
                 print("solved")
                 print(f"iteration: {iterations}")
                 print("\nstate:")
@@ -143,37 +144,33 @@ class StackFrontier:
             # adding the child nodes to the frontier
             if up is not None:
                 new_state = state.copy()
-                action = "goal"
+                is_goal = up == "goal"
                 if up == " ":
                     new_state[node.posY - 1] = new_state[node.posY - 1][:node.posX] + "*" + new_state[node.posY - 1][node.posX + 1:]
-                    action = "up"
 
-                self.add(Node(new_state, node, action, node.posX, node.posY - 1))
+                self.add(Node(new_state, node, "up", node.posX, node.posY - 1, is_goal))
 
             if down is not None:
                 new_state = state.copy()
-                action = "goal"
+                is_goal = down == "goal"
                 if down == " ":
                     new_state[node.posY + 1] = new_state[node.posY + 1][:node.posX] + "*" + new_state[node.posY + 1][node.posX + 1:]
-                    action = "down"
 
-                self.add(Node(new_state, node, action, node.posX, node.posY + 1))
+                self.add(Node(new_state, node, "down", node.posX, node.posY + 1, is_goal))
 
             if left is not None:
                 new_state = state.copy()
-                action = "goal"
+                is_goal = left == "goal"
                 if left == " ":
                     new_state[node.posY] = new_state[node.posY][:node.posX - 1] + "*" + new_state[node.posY][node.posX:]
-                    action = "left"
-                self.add(Node(new_state, node, action, node.posX - 1, node.posY))
+                self.add(Node(new_state, node, "left", node.posX - 1, node.posY, is_goal))
 
             if right is not None:
                 new_state = state.copy()
-                action = "goal"
+                is_goal = right == "goal"
                 if right == " ":
                     new_state[node.posY] = new_state[node.posY][:node.posX + 1] + "*" + new_state[node.posY][node.posX + 2:]
-                    action = "right"
-                self.add(Node(new_state, node, action, node.posX + 1, node.posY))
+                self.add(Node(new_state, node, "right", node.posX + 1, node.posY, is_goal))
             
             iterations+=1
 
