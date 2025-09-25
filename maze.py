@@ -439,9 +439,11 @@ def main():
         sys.exit(1)
 
     frontier = DepthFirstSearch()
-    if sys.argv[2] == "BFS":
+    if algorithm == "DFS":
+        pass
+    elif algorithm == "BFS":
         frontier = BreadthFirstSearch()
-    elif sys.argv[2] == "A*":
+    elif algorithm == "A*":
         frontier = AStarSearch()
 
     print(" "*100)
