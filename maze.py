@@ -40,7 +40,7 @@ class Node:
         self.manhattan_distance = None
         self.cost = None
         if goalY != None and goalX != None and step != None:
-            self.manhattan_distance = (goalX - posX) + (goalY - posY)
+            self.manhattan_distance = abs(goalX - posX) + abs(goalY - posY)
             self.cost = self.manhattan_distance + step
     
     def __repr__(self):
@@ -130,6 +130,10 @@ class DepthFirstSearch():
             
             # remove a node
             node = self.remove()
+
+            if node in self.explored:
+                continue
+
             state = node.state
             posX = node.posX
             posY = node.posY
@@ -224,9 +228,11 @@ class AStarSearch:
     def __init__(self):
         self.frontier = Frontier()
         self.explored = []
+        self.actions = []
     
     def solve(self, file):
         startTime = time.time()
+        
         state = file.readlines()
         state = [line.strip('\n') for line in state]
         
@@ -284,11 +290,22 @@ class AStarSearch:
                 [print(line) for line in state] 
                 print("no solutions")
                 return state
+
             
-            # remove a node
-            node = self.frontier.removeLast()
+            costs = {}
+            # add costs of nodes in frontier
+            for n in self.frontier.frontier:
+                if n.cost!=None:
+                    costs[n.cost] = n
+            
+            # remove a node 
+            node = self.frontier.removeNode(costs.get(min(costs.keys())))
+            if node in self.explored:
+                continue
+
             self.explored.append(node)
             self.addChildNodes(node, goalX, goalY)
+
             state = node.state
             cost = node.cost
             posX = node.posX
@@ -299,24 +316,7 @@ class AStarSearch:
                 [print(line) for line in state] 
                 print(f"Solved in {'{:.3f}'.format((time.time()-startTime) * 1000)}ms / {iterations} iterations")
                 return state
-
-            costs = {}
-            for n in self.frontier.frontier:
-                if n.cost!=None:
-                    costs[n.cost] = n
-
-            # check if frontier has a node which has a lower cost than the current one
-            if min(costs.keys()) < cost:
-                node = costs.get(min(costs.keys()))
-                
-                # if so, remove that node
-                self.frontier.removeNode(node)
-                self.addChildNodes(node, goalX, goalY)
-                self.explored.append(node)
-                state = node.state
-                posX = node.posX
-                posY = node.posY
-
+            
             iterations+=1
 
     def addChildNodes(self, node, goalX, goalY):
