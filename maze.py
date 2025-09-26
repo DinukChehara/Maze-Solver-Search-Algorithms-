@@ -2,13 +2,14 @@ import sys
 import time
 
 if len(sys.argv) < 3:
-    print("Usage: python maze.py <file> <algorithm: DFS/BFS/A*> <other>")
+    print("Usage: python maze.py <file> <algorithm: DFS/BFS/A*> [show_info|show_frontier|show_image]")
     sys.exit(1)
 
 filename = sys.argv[1]
 algorithm = sys.argv[2].upper()
 showInfo = False
 showImage = False
+showFrontier = False
 
 for arg in sys.argv:
     if arg == "show_info":
@@ -16,6 +17,9 @@ for arg in sys.argv:
     
     if arg == "show_image":
         showImage = True
+    
+    if arg == "show_frontier":
+        showFrontier = True
 
 print(filename)
 print(algorithm)
@@ -104,13 +108,17 @@ class DepthFirstSearch():
 
         startNode = Node(state, None, None, startX, startY, False)
         self.frontier.add(startNode)
+        posX = startX
+        posY = startY
 
         iterations = 0
         while True:
+            if showFrontier:
+                print("frontier: ", self.frontier.frontier)
             if showInfo:
                 print(f"iterations: {iterations}")
-                print("frontier: ", self.frontier.frontier)
-                print("\nstate:")
+                print(f"currentPos:{posX, posY}")
+            print("\nstate:")
             [print(line) for line in state] 
             print("\n"*4)
 
@@ -123,6 +131,8 @@ class DepthFirstSearch():
             # remove a node
             node = self.remove()
             state = node.state
+            posX = node.posX
+            posY = node.posY
 
             # checks if the node is the goal
             if node.is_goal:
@@ -246,6 +256,8 @@ class AStarSearch:
 
         startNode = Node(state, None, None,startX, startY, False, goalX, goalY, 0)
         self.frontier.add(startNode)
+        posX = startX
+        posY = startY
 
         """ 
         check if frontier is empty
@@ -257,11 +269,13 @@ class AStarSearch:
         
         iterations = 0
         while True:
+            if showFrontier:
+                print("frontier: ", self.frontier.frontier)
             if showInfo:
                 print(f"iterations: {iterations}")
-                print("frontier: ", self.frontier.frontier)
+                print(f"currentPos:{posX, posY}")
                 print(f"goalPos:{goalX, goalY}")
-                print("\nstate:")
+            print("\nstate:")
             [print(line) for line in state] 
             print("\n"*4)
             
@@ -277,6 +291,8 @@ class AStarSearch:
             self.addChildNodes(node, goalX, goalY)
             state = node.state
             cost = node.cost
+            posX = node.posX
+            posY = node.posY
 
             # check if node is the goal
             if node.is_goal:
@@ -298,6 +314,8 @@ class AStarSearch:
                 self.addChildNodes(node, goalX, goalY)
                 self.explored.append(node)
                 state = node.state
+                posX = node.posX
+                posY = node.posY
 
             iterations+=1
 
