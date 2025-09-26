@@ -1,11 +1,22 @@
 import sys
+import time
 
-if len(sys.argv) != 3:
-    print("Usage: python maze.py <file> <algorithm: DFS | BFS | A*>")
+if len(sys.argv) < 3:
+    print("Usage: python maze.py <file> <algorithm: DFS/BFS/A*> <other>")
     sys.exit(1)
 
 filename = sys.argv[1]
 algorithm = sys.argv[2].upper()
+showInfo = False
+showImage = False
+
+for arg in sys.argv:
+    if arg == "show_info":
+        showInfo = True
+    
+    if arg == "show_image":
+        showImage = True
+
 print(filename)
 print(algorithm)
 
@@ -69,6 +80,7 @@ class DepthFirstSearch():
         return node
 
     def solve(self, file):
+        startTime = time.time()
         state = file.readlines()
         state = [line.strip("\n") for line in state]
     
@@ -95,16 +107,18 @@ class DepthFirstSearch():
 
         iterations = 0
         while True:
-            print(f"iterations: {iterations}")
-            print("frontier: ", self.frontier.frontier)
-            print("\nstate:")
+            if showInfo:
+                print(f"iterations: {iterations}")
+                print("frontier: ", self.frontier.frontier)
+                print("\nstate:")
             [print(line) for line in state] 
             print("\n"*4)
 
             # checks if the frontier is empty
             if self.frontier.empty():
+                [print(line) for line in state] 
                 print("no solution")
-                break
+                return state
             
             # remove a node
             node = self.remove()
@@ -112,8 +126,9 @@ class DepthFirstSearch():
 
             # checks if the node is the goal
             if node.is_goal:
-                print("solved")
-                break
+                [print(line) for line in state] 
+                print(f"Solved in {'{:.3f}'.format((time.time()-startTime) * 1000)}ms / {iterations} iterations")
+                return state
 
             self.explored.append(node)
 
@@ -189,9 +204,6 @@ class DepthFirstSearch():
             self.actions.append(node.action)
             iterations+=1
 
-
-        return state
-
 class BreadthFirstSearch(DepthFirstSearch):
     def remove(self):
         node = self.frontier.removeAt(0)
@@ -204,6 +216,7 @@ class AStarSearch:
         self.explored = []
     
     def solve(self, file):
+        startTime = time.time()
         state = file.readlines()
         state = [line.strip('\n') for line in state]
         
@@ -244,15 +257,17 @@ class AStarSearch:
         
         iterations = 0
         while True:
-            print(f"iterations: {iterations}")
-            print("frontier: ", self.frontier.frontier)
-            print(f"goalPos:{goalX, goalY}")
-            print("\nstate:")
+            if showInfo:
+                print(f"iterations: {iterations}")
+                print("frontier: ", self.frontier.frontier)
+                print(f"goalPos:{goalX, goalY}")
+                print("\nstate:")
             [print(line) for line in state] 
             print("\n"*4)
             
             # check if frontier is empty
             if len(self.frontier.frontier) == 0:
+                [print(line) for line in state] 
                 print("no solutions")
                 return state
             
@@ -265,7 +280,8 @@ class AStarSearch:
 
             # check if node is the goal
             if node.is_goal:
-                print("solved")
+                [print(line) for line in state] 
+                print(f"Solved in {'{:.3f}'.format((time.time()-startTime) * 1000)}ms / {iterations} iterations")
                 return state
 
             costs = {}
@@ -459,7 +475,8 @@ def main():
     print(" "*100)
     state = frontier.solve(file)
     file.close()
-    visualize_maze(state, frontier.explored)
+    if showImage:
+        visualize_maze(state, frontier.explored)
 
 if __name__ == "__main__":
     main()
