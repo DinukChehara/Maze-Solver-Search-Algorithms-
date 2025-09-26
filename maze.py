@@ -10,7 +10,7 @@ print(filename)
 print(algorithm)
 
 if algorithm not in ["DFS", "BFS", "A*"]:
-    print("Invlaid algorithm. Algorithms: DFS, BFS")
+    print("Invlaid algorithm. Algorithms: DFS, BFS, A*")
     sys.exit(1)
 
 class Node:
@@ -79,7 +79,7 @@ class DepthFirstSearch():
             try: startX = row.index("A")
             except: continue
             if startX == None:
-                raise "Start position now found"
+                raise "Start position not found"
             startY = state.index(row)
             break
 
@@ -96,7 +96,7 @@ class DepthFirstSearch():
         iterations = 0
         while True:
             print(f"iterations: {iterations}")
-            print("frontier: ", self.frontier)
+            print("frontier: ", self.frontier.frontier)
             print("\nstate:")
             [print(line) for line in state] 
             print("\n"*4)
@@ -234,11 +234,14 @@ class AStarSearch:
         startNode = Node(state, None, None,startX, startY, False, goalX, goalY, 0)
         self.frontier.add(startNode)
 
-        # check if frontier is empty
-        # remove a node
-        # check if node = goal
-        # check if fronteir has any node with low cost -> remove that node
-        # add child nodes to frontier
+        """ 
+        check if frontier is empty
+        remove a node
+        check if node = goal
+        check if fronteir has any node with low cost -> remove that node
+        add child nodes to frontier 
+        """
+        
         iterations = 0
         while True:
             print(f"iterations: {iterations}")
@@ -248,16 +251,19 @@ class AStarSearch:
             [print(line) for line in state] 
             print("\n"*4)
             
+            # check if frontier is empty
             if len(self.frontier.frontier) == 0:
                 print("no solutions")
                 return state
             
+            # remove a node
             node = self.frontier.removeLast()
             self.explored.append(node)
             self.addChildNodes(node, goalX, goalY)
             state = node.state
             cost = node.cost
 
+            # check if node is the goal
             if node.is_goal:
                 print("solved")
                 return state
@@ -266,9 +272,12 @@ class AStarSearch:
             for n in self.frontier.frontier:
                 if n.cost!=None:
                     costs[n.cost] = n
+
+            # check if frontier has a node which has a lower cost than the current one
             if min(costs.keys()) < cost:
                 node = costs.get(min(costs.keys()))
                 
+                # if so, remove that node
                 self.frontier.removeNode(node)
                 self.addChildNodes(node, goalX, goalY)
                 self.explored.append(node)
@@ -355,6 +364,7 @@ class AStarSearch:
                 self.frontier.add(Node(new_state, node, "right", node.posX + 1, node.posY, is_goal, goalX, goalY, parentStep+1))
 
 
+# made by chatgpt i dont wanna learn this shi
 def visualize_maze(maze, explored):
     try:
         import matplotlib.pyplot as plt
