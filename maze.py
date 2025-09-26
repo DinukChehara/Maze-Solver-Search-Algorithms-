@@ -26,12 +26,14 @@ class Node:
         self.posY = posY
         self.is_goal = is_goal
         self.step = step
+        self.manhattan_distance = None
         self.cost = None
         if goalY != None and goalX != None and step != None:
-            self.cost = (goalX - posX) + (goalY - posY) + step
+            self.manhattan_distance = (goalX - posX) + (goalY - posY)
+            self.cost = self.manhattan_distance + step
     
     def __repr__(self):
-        return f"Node(action={self.action}, pos=({self.posX}, {self.posY}), goal={self.is_goal}, step={self.step}, cost={self.cost})"
+        return f"Node(action={self.action}, pos=({self.posX}, {self.posY}), goal={self.is_goal}, step={self.step}, manhattan_distance={self.manhattan_distance}, cost={self.cost})"
 
 class Frontier():
     def __init__(self):
@@ -97,7 +99,7 @@ class DepthFirstSearch():
 
         iterations = 0
         while True:
-            print(f"iteration: {iterations}")
+            print(f"iterations: {iterations}")
             print("frontier: ", self.frontier)
             print("\nstate:")
             [print(line) for line in state] 
@@ -115,9 +117,6 @@ class DepthFirstSearch():
             # checks if the node is the goal
             if node.is_goal:
                 print("solved")
-                print(f"iteration: {iterations}")
-                print("\nstate:")
-                [print(line) for line in state] 
                 break
 
             self.explored.append(node)
@@ -246,13 +245,12 @@ class AStarSearch:
         # add child nodes to frontier
         iterations = 0
         while True:
-            print("\n"*10)
-            print(f"startPos={startX},{startY}")
-            print(f"goalPos={goalX},{goalY}")
-            print(self.frontier.frontier)
-            print("iteration: ", iterations)
-            print("\nstate: ")
-            [print(line) for line in state]
+            print(f"iterations: {iterations}")
+            print("frontier: ", self.frontier.frontier)
+            print(f"goalPos:{goalX, goalY}")
+            print("\nstate:")
+            [print(line) for line in state] 
+            print("\n"*4)
             
             if len(self.frontier.frontier) == 0:
                 print("no solutions")
