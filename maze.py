@@ -36,8 +36,6 @@ class Node:
 class Frontier():
     def __init__(self):
         self.frontier = []
-        self.explored = []
-        self.actions = []
 
     def add(self, node):
         self.frontier.append(node)
@@ -50,19 +48,26 @@ class Frontier():
     
     def removeNode(self, node):
         self.frontier.remove(node)
+        return node
 
-    def remove(self):
+    def removeLast(self):
         node = self.frontier[-1]
         self.frontier.pop(-1)
         return node
+    
+    def removeAt(self, i):
+        node = self.frontier[i]
+        self.frontier.pop(i)
+        return node
 
-class DepthFirstSearch(Frontier):
+class DepthFirstSearch():
+    def __init__(self):
+        self.frontier = Frontier()
+        self.explored = []
+        self.actions = []
 
     def remove(self):
-        if self.empty():
-            raise Exception("Frontier is empty")
-        node = self.frontier[-1]
-        self.frontier.pop(-1)
+        node = self.frontier.removeLast()
         return node
 
     def solve(self, file):
@@ -88,7 +93,7 @@ class DepthFirstSearch(Frontier):
         """
 
         startNode = Node(state, None, None, startX, startY, False)
-        self.add(startNode)
+        self.frontier.add(startNode)
 
         iterations = 0
         while True:
@@ -99,7 +104,7 @@ class DepthFirstSearch(Frontier):
             print("\n"*4)
 
             # checks if the frontier is empty
-            if self.empty():
+            if self.frontier.empty():
                 print("no solution")
                 break
             
@@ -114,7 +119,7 @@ class DepthFirstSearch(Frontier):
                 print("\nstate:")
                 [print(line) for line in state] 
                 break
-            
+
             self.explored.append(node)
 
             up = None
@@ -162,7 +167,7 @@ class DepthFirstSearch(Frontier):
                 if up == " ":
                     new_state[node.posY - 1] = new_state[node.posY - 1][:node.posX] + "*" + new_state[node.posY - 1][node.posX + 1:]
 
-                self.add(Node(new_state, node, "up", node.posX, node.posY - 1, is_goal))
+                self.frontier.add(Node(new_state, node, "up", node.posX, node.posY - 1, is_goal))
 
             if down is not None:
                 new_state = state.copy()
@@ -170,21 +175,21 @@ class DepthFirstSearch(Frontier):
                 if down == " ":
                     new_state[node.posY + 1] = new_state[node.posY + 1][:node.posX] + "*" + new_state[node.posY + 1][node.posX + 1:]
 
-                self.add(Node(new_state, node, "down", node.posX, node.posY + 1, is_goal))
+                self.frontier.add(Node(new_state, node, "down", node.posX, node.posY + 1, is_goal))
 
             if left is not None:
                 new_state = state.copy()
                 is_goal = left == "goal"
                 if left == " ":
                     new_state[node.posY] = new_state[node.posY][:node.posX - 1] + "*" + new_state[node.posY][node.posX:]
-                self.add(Node(new_state, node, "left", node.posX - 1, node.posY, is_goal))
+                self.frontier.add(Node(new_state, node, "left", node.posX - 1, node.posY, is_goal))
 
             if right is not None:
                 new_state = state.copy()
                 is_goal = right == "goal"
                 if right == " ":
                     new_state[node.posY] = new_state[node.posY][:node.posX + 1] + "*" + new_state[node.posY][node.posX + 2:]
-                self.add(Node(new_state, node, "right", node.posX + 1, node.posY, is_goal))
+                self.frontier.add(Node(new_state, node, "right", node.posX + 1, node.posY, is_goal))
             
             self.actions.append(node.action)
             iterations+=1
@@ -194,10 +199,7 @@ class DepthFirstSearch(Frontier):
 
 class BreadthFirstSearch(DepthFirstSearch):
     def remove(self):
-        if self.empty():
-            raise Exception("Frontier is empty")
-        node = self.frontier[0]
-        self.frontier.pop(0)
+        node = self.frontier.removeAt(0)
         return node
 
 
@@ -256,7 +258,7 @@ class AStarSearch:
                 print("no solutions")
                 return state
             
-            node = self.frontier.remove()
+            node = self.frontier.removeLast()
             self.explored.append(node)
             self.addChildNodes(node, goalX, goalY)
             state = node.state
@@ -272,9 +274,6 @@ class AStarSearch:
                     costs[n.cost] = n
             if min(costs.keys()) < cost:
                 node = costs.get(min(costs.keys()))
-                
-                print(self.frontier.frontier)
-                print(node)
                 
                 self.frontier.removeNode(node)
                 self.addChildNodes(node, goalX, goalY)
