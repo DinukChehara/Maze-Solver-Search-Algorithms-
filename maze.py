@@ -2,7 +2,15 @@ import sys
 import time
 
 if len(sys.argv) < 3:
-    print("Usage: python maze.py <file> <algorithm: DFS/BFS/A*> [show_info|show_frontier|show_image]")
+    print(
+    "Usage:\n"
+    "  python maze.py <maze_file> <algorithm> [options]\n\n"
+    "Arguments:\n"
+    "  <maze_file>     Path to the maze input file\n"
+    "  <algorithm>     One of: DFS | BFS | A*\n"
+    "  [options]       Optional flags: show_info | show_frontier | show_image"
+    )
+
     sys.exit(1)
 
 filename = sys.argv[1]
