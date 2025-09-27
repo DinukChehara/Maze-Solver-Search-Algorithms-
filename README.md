@@ -1,9 +1,9 @@
-# Maze Solutions
-
 ## Usage
 ```bash
 python maze.py <maze_file> <algorithm: DFS | BFS | A*> [options: show_info | show_frontier | show_image]
 ```
+
+# Maze Solutions
 
 ## Solved using Depth First Search – 1,131 iterations
 ![DFS Solution](images/dfs.png)
