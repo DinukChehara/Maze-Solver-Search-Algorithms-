@@ -159,38 +159,34 @@ class DepthFirstSearch():
             left = None
             right = None
             
-            try:
+            if node.posY > 0:
                 up = state[node.posY - 1][node.posX]
                 if up == "B":
                     up = "goal"
                     
                 elif up != " ":
                     up = None
-            except:pass
             
-            try:
+            if node.posY < len(state)-1:
                 down = state[node.posY + 1][node.posX]
                 if down == "B":
                     down = "goal"
                 elif down != " ":
                     down = None
-            except:pass
             
-            try:
+            if node.posX < len(state[node.posY]) -1:
                 right = state[node.posY][node.posX + 1]
                 if right == "B":
                     right = "goal"
                 elif right != " ":
                     right = None
-            except:pass
             
-            try: 
+            if node.posX > 0:
                 left = state[node.posY][node.posX - 1]
                 if left == "B":
                     left = "goal"
                 elif left != " ":
                     left = None
-            except: pass
 
             # adding the child nodes to the frontier
             if up is not None:
@@ -298,7 +294,6 @@ class AStarSearch:
                 [print(line) for line in state] 
                 print("no solutions")
                 return state
-
             
             costs = {}
             # add costs of nodes in frontier
@@ -335,38 +330,34 @@ class AStarSearch:
             left = None
             right = None
             
-            try:
+            if node.posY > 0:
                 up = state[node.posY - 1][node.posX]
                 if up == "B":
                     up = "goal"
                     
                 elif up != " ":
                     up = None
-            except:pass
             
-            try:
+            if node.posY < len(state)-1:
                 down = state[node.posY + 1][node.posX]
                 if down == "B":
                     down = "goal"
                 elif down != " ":
                     down = None
-            except:pass
             
-            try:
+            if node.posX < len(state[node.posY]) -1:
                 right = state[node.posY][node.posX + 1]
                 if right == "B":
                     right = "goal"
                 elif right != " ":
                     right = None
-            except:pass
             
-            try: 
+            if node.posX > 0:
                 left = state[node.posY][node.posX - 1]
                 if left == "B":
                     left = "goal"
                 elif left != " ":
                     left = None
-            except: pass
 
             # adding the child nodes to the frontier
             if up is not None:
