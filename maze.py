@@ -54,7 +54,7 @@ class Node:
     def __repr__(self):
         return f"Node(action={self.action}, pos=({self.posX}, {self.posY}), goal={self.is_goal}, step={self.step}, manhattan_distance={self.manhattan_distance}, cost={self.cost})"
 
-class Frontier():
+class StackFrontier():
     def __init__(self):
         self.frontier = []
 
@@ -71,25 +71,24 @@ class Frontier():
         self.frontier.remove(node)
         return node
 
-    def removeLast(self):
+    def remove(self):
         node = self.frontier[-1]
         self.frontier.pop(-1)
         return node
-    
-    def removeAt(self, i):
-        node = self.frontier[i]
-        self.frontier.pop(i)
+
+class QueueFrontier(StackFrontier):
+    def __init__(self):
+        super().__init__()
+    def remove(self):
+        node = self.frontier[0]
+        self.frontier.pop(0)
         return node
 
 class DepthFirstSearch():
     def __init__(self):
-        self.frontier = Frontier()
+        self.frontier = StackFrontier()
         self.explored = []
         self.actions = []
-
-    def remove(self):
-        node = self.frontier.removeLast()
-        return node
 
     def solve(self, file):
         startTime = time.time()
@@ -137,7 +136,7 @@ class DepthFirstSearch():
                 return state
             
             # remove a node
-            node = self.remove()
+            node = self.frontier.remove()
 
             if node in self.explored:
                 continue
@@ -227,14 +226,14 @@ class DepthFirstSearch():
             iterations+=1
 
 class BreadthFirstSearch(DepthFirstSearch):
-    def remove(self):
-        node = self.frontier.removeAt(0)
-        return node
+    def __init__(self):
+        super().__init__()
+        self.frontier = QueueFrontier()
 
 
 class AStarSearch:
     def __init__(self):
-        self.frontier = Frontier()
+        self.frontier = StackFrontier()
         self.explored = []
         self.actions = []
     
