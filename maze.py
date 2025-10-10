@@ -8,9 +8,10 @@ if len(sys.argv) < 3:
     "Arguments:\n"
     "  <maze_file>     Path to the maze input file\n"
     "  <algorithm>     One of: DFS | BFS | A*\n"
-    "  [options]       Optional flags: show_info | show_frontier | show_image"
+    "  [options]       Optional flags: show_info | show_frontier | show_image\n"
     )
 
+    input("You have to run this via a terminal")
     sys.exit(1)
 
 filename = sys.argv[1]
