@@ -128,12 +128,15 @@ class DepthFirstSearch():
             if showFrontier:
                 print("frontier: ", self.frontier.frontier)
             if showInfo:
+                print(f"time elapsed: {'{:.3f}'.format(time.time()-startTime)}s")
                 print(f"iterations: {iterations}")
                 print(f"currentPos:{posX, posY}")
             if display_maze:
                 print("\nstate:")
                 [print(line) for line in state] 
                 print("\n"*4)
+            if showFrontier or showInfo:
+                print("\n"*3)
 
             # checks if the frontier is empty
             if self.frontier.empty():
@@ -153,8 +156,10 @@ class DepthFirstSearch():
 
             # checks if the node is the goal
             if node.is_goal:
+                time_ms = '{:.3f}'.format((time.time()-startTime) * 1000)
+                time_s = '{:.3f}'.format((time.time()-startTime))
                 [print(line) for line in state] 
-                print(f"Solved in {'{:.3f}'.format((time.time()-startTime) * 1000)}ms / {iterations} iterations")
+                print(f"Solved in {time_s}s ({time_ms}ms)  / {iterations} iterations")
                 return state
 
             self.explored.append(node)
@@ -287,6 +292,7 @@ class AStarSearch:
             if showFrontier:
                 print("frontier: ", self.frontier.frontier)
             if showInfo:
+                print(f"time elapsed: {'{:.3f}'.format(time.time()-startTime)}s")
                 print(f"iterations: {iterations}")
                 print(f"currentPos:{posX, posY}")
                 print(f"goalPos:{goalX, goalY}")
@@ -294,6 +300,8 @@ class AStarSearch:
                 print("\nstate:")
                 [print(line) for line in state] 
                 print("\n"*4)
+            if showFrontier or showInfo:
+                print("\n"*3)
             
             # check if frontier is empty
             if len(self.frontier.frontier) == 0:
@@ -322,8 +330,10 @@ class AStarSearch:
 
             # check if node is the goal
             if node.is_goal:
+                time_ms = '{:.3f}'.format((time.time()-startTime) * 1000)
+                time_s = '{:.3f}'.format((time.time()-startTime))
                 [print(line) for line in state] 
-                print(f"Solved in {'{:.3f}'.format((time.time()-startTime) * 1000)}ms / {iterations} iterations")
+                print(f"Solved in {time_s}s ({time_ms}ms)  / {iterations} iterations")
                 return state
             
             iterations+=1
