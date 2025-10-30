@@ -16,7 +16,7 @@ if len(sys.argv) < 3:
 
 filename = sys.argv[1]
 algorithm = sys.argv[2].upper()
-disable_output = False
+display_maze = False
 showInfo = False
 showImage = False
 showFrontier = False
@@ -31,8 +31,8 @@ for arg in sys.argv:
     if arg == "show_frontier":
         showFrontier = True
 
-    if arg == "disable_output":
-        disable_output = True
+    if arg == "display_maze":
+        display_maze = True
 
 print(filename)
 print(algorithm)
@@ -125,12 +125,12 @@ class DepthFirstSearch():
 
         iterations = 0
         while True:
-            if not disable_output:
-                if showFrontier:
-                    print("frontier: ", self.frontier.frontier)
-                if showInfo:
-                    print(f"iterations: {iterations}")
-                    print(f"currentPos:{posX, posY}")
+            if showFrontier:
+                print("frontier: ", self.frontier.frontier)
+            if showInfo:
+                print(f"iterations: {iterations}")
+                print(f"currentPos:{posX, posY}")
+            if display_maze:
                 print("\nstate:")
                 [print(line) for line in state] 
                 print("\n"*4)
@@ -284,13 +284,13 @@ class AStarSearch:
         
         iterations = 0
         while True:
-            if not disable_output:
-                if showFrontier:
-                    print("frontier: ", self.frontier.frontier)
-                if showInfo:
-                    print(f"iterations: {iterations}")
-                    print(f"currentPos:{posX, posY}")
-                    print(f"goalPos:{goalX, goalY}")
+            if showFrontier:
+                print("frontier: ", self.frontier.frontier)
+            if showInfo:
+                print(f"iterations: {iterations}")
+                print(f"currentPos:{posX, posY}")
+                print(f"goalPos:{goalX, goalY}")
+            if display_maze:
                 print("\nstate:")
                 [print(line) for line in state] 
                 print("\n"*4)
