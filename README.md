@@ -1,6 +1,6 @@
 # Usage
 ```bash
-python maze.py <maze_file> <algorithm: DFS | BFS | A*> [options: show_info | show_frontier | show_image]
+python maze.py <maze_file> <algorithm: DFS | BFS | A*> [options: disable_output |  show_info | show_frontier | show_image]
 ```
 
 # Maze Solutions

@@ -16,6 +16,7 @@ if len(sys.argv) < 3:
 
 filename = sys.argv[1]
 algorithm = sys.argv[2].upper()
+disable_output = False
 showInfo = False
 showImage = False
 showFrontier = False
@@ -29,6 +30,9 @@ for arg in sys.argv:
     
     if arg == "show_frontier":
         showFrontier = True
+
+    if arg == "disable_output":
+        disable_output = True
 
 print(filename)
 print(algorithm)
@@ -121,14 +125,15 @@ class DepthFirstSearch():
 
         iterations = 0
         while True:
-            if showFrontier:
-                print("frontier: ", self.frontier.frontier)
-            if showInfo:
-                print(f"iterations: {iterations}")
-                print(f"currentPos:{posX, posY}")
-            print("\nstate:")
-            [print(line) for line in state] 
-            print("\n"*4)
+            if not disable_output:
+                if showFrontier:
+                    print("frontier: ", self.frontier.frontier)
+                if showInfo:
+                    print(f"iterations: {iterations}")
+                    print(f"currentPos:{posX, posY}")
+                print("\nstate:")
+                [print(line) for line in state] 
+                print("\n"*4)
 
             # checks if the frontier is empty
             if self.frontier.empty():
@@ -279,15 +284,16 @@ class AStarSearch:
         
         iterations = 0
         while True:
-            if showFrontier:
-                print("frontier: ", self.frontier.frontier)
-            if showInfo:
-                print(f"iterations: {iterations}")
-                print(f"currentPos:{posX, posY}")
-                print(f"goalPos:{goalX, goalY}")
-            print("\nstate:")
-            [print(line) for line in state] 
-            print("\n"*4)
+            if not disable_output:
+                if showFrontier:
+                    print("frontier: ", self.frontier.frontier)
+                if showInfo:
+                    print(f"iterations: {iterations}")
+                    print(f"currentPos:{posX, posY}")
+                    print(f"goalPos:{goalX, goalY}")
+                print("\nstate:")
+                [print(line) for line in state] 
+                print("\n"*4)
             
             # check if frontier is empty
             if len(self.frontier.frontier) == 0:
